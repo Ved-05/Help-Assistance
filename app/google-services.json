@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1044317059535",
+    "firebase_url": "https://help-assistance.firebaseio.com",
+    "project_id": "help-assistance",
+    "storage_bucket": "help-assistance.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044317059535:android:980dece45321b1eb",
+        "android_client_info": {
+          "package_name": "demo.breath.com.helpassistance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1044317059535-7scqbukjodjhad4icqn7pndae1sr3scf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "demo.breath.com.helpassistance",
+            "certificate_hash": "d53b46dce08866463bb3fbfdd8486b105eb4a991"
+          }
+        },
+        {
+          "client_id": "1044317059535-g3dd5frf1k7vt4s8q1c4avspo206or77.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZdYs_LuJUcjJA2LHcUGBMDHyQOr7hvgQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1044317059535-g3dd5frf1k7vt4s8q1c4avspo206or77.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

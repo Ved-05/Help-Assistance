@@ -1,0 +1,56 @@
+<resources>
+    <string name="app_name">Help Assistance</string>
+    <string name="title_activity_sign_up">SignUpActivity</string>
+    <string name="help_assistance">Help Assistance</string>
+    <string name="enter_your_e_mail">Enter your E-Mail</string>
+    <string name="choose_a_password">Choose a password</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_in">Sign In</string>
+    <string name="already_registered">Already Registered ?</string>
+    <string name="hello">Hello,</string>
+    <string name="user_name">User Name</string>
+    <string name="details">Please, fill below details</string>
+    <string name="i_am">I am</string>
+    <string name="your_name_here">Your Name Here</string>
+    <string name="female">Female</string>
+    <string name="transgender">Transgender</string>
+    <string name="male">Male</string>
+    <string name="born_on">Born On,</string>
+    <string name="dd_mm_yyyy">DD/MM/YYYY</string>
+    <string name="mobile_number">Mobile Number,</string>
+    <string name="this_number_will_be_used_for_communication">This number will be used for communication</string>
+    <string name="title_activity_home">Home</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="dashboard">DashBoard</string>
+    <string name="settings">Settings</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="greetings_username">Greetings</string>
+    <string name="we_re_here_for_you">We\'re here for you</string>
+    <string name="todo">TODO</string>
+    <string name="emergency_assistance_sos">Emergency Assistance ( SOS )</string>
+    <string name="one_touch_emergency_assistance">One Touch Emergency Assistance</string>
+    <string name="accident">Accident</string>
+    <string name="accident_button">Accident Button</string>
+    <string name="harassment">Harassment</string>
+    <string name="medical_button">Medical Button</string>
+    <string name="terrorism_button">Terrorism Button</string>
+    <string name="display_assistance">Display Assistance</string>
+    <string name="hold_tight_dispatch_is_on_the_way">Hold tight, dispatch is on the way</string>
+    <string name="detected_location">DETECTED LOCATION</string>
+    <string name="government_college_of_engineering_kathora_naka_amravati_maharahtra">Government College of Engineering, Kathora Naka, Amravati, Maharashtra</string>
+    <string name="police_station_shegaon_naka_amravati_maharashtra_india">Police Station, Shegaon Naka, Amravati, Maharashtra, India</string>
+    <string name="alert_send_to">Alert Send To</string>
+    <string name="cancel">Cancel</string>
+    <string name="out_of_emergency">Out Of Emergency</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="are_you_sure_you_don_t_need_to_help">Are you sure, You don\'t need to help ?</string>
+    <string name="maps">Maps</string>
+</resources>
