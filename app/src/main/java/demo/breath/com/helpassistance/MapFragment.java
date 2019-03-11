@@ -20,11 +20,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
-public class Map extends Fragment implements OnMapReadyCallback{
+public class MapFragment extends Fragment implements OnMapReadyCallback{
 
     private GoogleMap mMap;
 
-    public Map() {
+    public MapFragment() {
         // Required empty public constructor
     }
 

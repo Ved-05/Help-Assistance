@@ -5,11 +5,13 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.icu.text.SimpleDateFormat;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -18,27 +20,42 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.FirebaseDatabase;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.security.PrivateKey;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+
+import io.opencensus.tags.Tag;
 
 public class UserDetails extends AppCompatActivity {
     private TextView welcomeUser, DOB;
     private EditText name, mobNo;
     private RadioButton male, female, transgender;
     private Button complete;
-
+    private FirebaseFirestore database;
     final Calendar myCalendar = Calendar.getInstance();
+    private FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_details);
-        //get from previous activity
-        Intent intent = getIntent();
-        final String userId = intent.getStringExtra("userId");
-        //firebase
+
+        //firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+
+        // Access a Cloud Firestore instance from your Activity
+        database = FirebaseFirestore.getInstance();
 
         welcomeUser = (TextView) findViewById(R.id.welcomeUser);
         //entries
@@ -109,8 +126,8 @@ public class UserDetails extends AppCompatActivity {
                 }else if(mobile.isEmpty()){
                     Toast.makeText(getApplicationContext(),"Check Mobile Number",Toast.LENGTH_SHORT).show();
                 }else{
-                    addDetails(userId,userName,gender,date,mobile);
-                    Toast.makeText(getApplicationContext(),"Got Details Successfully !!",Toast.LENGTH_SHORT).show();
+                    addDetails(userName,gender,date,mobile);
+
                     //launch next
                     Intent intent = new Intent(getApplicationContext(), Home.class);
                     startActivity(intent);
@@ -120,8 +137,23 @@ public class UserDetails extends AppCompatActivity {
         });
     }
 
-   private void addDetails(String userId, String userName, String gender, String date, String mobile) {
-         UserData user = new UserData(userName, gender, date, mobile);
-         FirebaseDatabase.getInstance().getReference().child("users").child("allUsers").child(userId).setValue(user);
+   private void addDetails(String userName, String gender, String date, String mobile) {
+       String userId = mAuth.getCurrentUser().getUid();
+       Map<String, Object> node = new HashMap<>();
+       node.put("name", userName);
+       node.put("gender", gender);
+       node.put("date-of-birth", date);
+       node.put("mobile-number", mobile);
+       node.put("ID", userId);
+
+       database.collection("users")
+               .document(userId).set(node)
+               .addOnSuccessListener(new OnSuccessListener<Void>() {
+                   @Override
+                   public void onSuccess(Void aVoid) {
+                       Toast.makeText(getApplicationContext(), "User Details Captured", Toast.LENGTH_SHORT).show();
+                   }
+               })
+       ;
    }
 }

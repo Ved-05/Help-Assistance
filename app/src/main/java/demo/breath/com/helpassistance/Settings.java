@@ -12,11 +12,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class Settings extends Fragment {
@@ -25,7 +30,7 @@ public class Settings extends Fragment {
     private Button signOutBtn;
     //firebase
     private FirebaseAuth mAuth;
-    private DatabaseReference mDatabase;
+    private FirebaseFirestore database;
 
     //construtor
     public Settings() {
@@ -43,30 +48,30 @@ public class Settings extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         //firebase
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
-        //get userId
+        database = FirebaseFirestore.getInstance();
+
         final String userId = mAuth.getCurrentUser().getUid();
 
         signOutBtn = (Button) view.findViewById(R.id.signOut);
         signOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mDatabase.child("usersActive").child(userId).setValue(null);
-                mAuth.signOut();
-                getActivity().finish();
+                database.collection("active").document(userId)
+                        .delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                mAuth.signOut();
+                                getActivity().finish();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(getActivity().getApplicationContext(), "Failed deleting node.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser!=null){
-            String user_id = mAuth.getCurrentUser().getUid();
-            DatabaseReference db = FirebaseDatabase.getInstance().getReference().child("users").child("usersActive").child(user_id);
-            db.setValue(true);
-        }
     }
 }

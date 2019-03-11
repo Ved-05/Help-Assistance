@@ -21,7 +21,7 @@ public class Home extends FragmentActivity implements BottomNavigationView.OnNav
                 break;
 
             case R.id.navigation_maps:
-                fragment = new Map();
+                fragment = new MapFragment();
                 break;
 
             //case R.id.nav_notif:

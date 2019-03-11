@@ -16,14 +16,18 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignUp extends AppCompatActivity {
     private EditText getEmail, getPassword;
     private TextView textAlready;
     private Button signUser, changeScreen;
     private FirebaseAuth mAuth;
+    private FirebaseFirestore database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,7 @@ public class SignUp extends AppCompatActivity {
 
         //firebase
         mAuth = FirebaseAuth.getInstance();
+        database = FirebaseFirestore.getInstance();
 
         //email and password
         getEmail = (EditText) findViewById(R.id.getMail);
@@ -92,14 +97,11 @@ public class SignUp extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information\
-                            String user_id = mAuth.getCurrentUser().getUid();
-                            DatabaseReference db = FirebaseDatabase.getInstance().getReference().child("users").child("usersActive").child(user_id);
-                            db.setValue(true);
+                            updateActiveUsers();
 
                             Intent intent = new Intent(SignUp.this, Home.class);
-
                             startActivity(intent);
-                            finish();
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(SignUp.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
@@ -114,15 +116,11 @@ public class SignUp extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information\
-                    String user_id = mAuth.getCurrentUser().getUid();
-                    DatabaseReference db = FirebaseDatabase.getInstance().getReference().child("users").child("usersActive").child(user_id);
-                    db.setValue(true);
+                    updateActiveUsers();
 
                     Intent intent = new Intent(SignUp.this, UserDetails.class);
-                    intent.putExtra("userId", user_id);
-
                     startActivity(intent);
-                    finish();
+
                 } else {
                     // If sign in fails, display a message to the user.
                     Toast.makeText(SignUp.this, "Registration failed.", Toast.LENGTH_SHORT).show();
@@ -137,14 +135,20 @@ public class SignUp extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser!=null){
-            String user_id = mAuth.getCurrentUser().getUid();
-            DatabaseReference db = FirebaseDatabase.getInstance().getReference().child("users").child("usersActive").child(user_id);
-            db.setValue(true);
+            updateActiveUsers();
 
             Intent intent = new Intent(SignUp.this, Home.class);
-            intent.putExtra("userId", user_id);
             startActivity(intent);
-            finish();
+        }
+    }
+
+    private void updateActiveUsers() {
+        if(mAuth.getCurrentUser() != null) {
+            String user_id = mAuth.getCurrentUser().getUid();
+            Map<String, Object> node = new HashMap<>();
+            node.put("user_id", user_id);
+
+            database.collection("active").document(user_id).set(node);
         }
     }
 }
