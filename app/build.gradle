@@ -30,12 +30,14 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     // ...
-    //firebase auth
+    //firebase core & auth
     implementation 'com.google.firebase:firebase-core:16.0.6'
     implementation 'com.google.firebase:firebase-auth:16.1.0'
 
     //firestore
     implementation 'com.google.firebase:firebase-firestore:18.0.1'
+
+    //google play serices for maps
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
 }
 // ADD THIS AT THE BOTTOM

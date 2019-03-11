@@ -53,4 +53,5 @@
     <string name="yes">Yes</string>
     <string name="are_you_sure_you_don_t_need_to_help">Are you sure, You don\'t need to help ?</string>
     <string name="maps">Maps</string>
+    <string name="google_maps_api_key">AIzaSyB0jfByn_dyejB9-e5-V_olfgmVhyhdVwQ</string>
 </resources>
