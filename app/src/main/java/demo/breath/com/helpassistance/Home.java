@@ -1,11 +1,13 @@
 package demo.breath.com.helpassistance;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,12 +17,22 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 
 import static demo.breath.com.helpassistance.Constants.ERROR_DIALOG_REQUEST;
 import static demo.breath.com.helpassistance.Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION;
@@ -29,6 +41,11 @@ import static demo.breath.com.helpassistance.Constants.PERMISSIONS_REQUEST_ENABL
 public class Home extends FragmentActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private boolean mLocationPermissionGranted = false;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private UserLocation mUserLocation;
+    private FirebaseFirestore mDb;
+    private FirebaseAuth mAuth;
+    private static final String TAG = "Home";
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -60,8 +77,10 @@ public class Home extends FragmentActivity implements BottomNavigationView.OnNav
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        //loading the default fragment
-        //loadFragment(new Dashboard());
+        mAuth = FirebaseAuth.getInstance();
+        mDb = FirebaseFirestore.getInstance();
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         //getting bottom navigation view and attaching the listener
         BottomNavigationView navigation = findViewById(R.id.navigation);
@@ -78,6 +97,71 @@ public class Home extends FragmentActivity implements BottomNavigationView.OnNav
             return true;
         }
         return false;
+    }
+
+    private void getUserDetails(){
+        if(mUserLocation == null){
+            mUserLocation = new UserLocation();
+            DocumentReference userRef = mDb.collection(getString(R.string.collection_users))
+                    .document(FirebaseAuth.getInstance().getUid());
+
+            userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if(task.isSuccessful()){
+                        Log.d(TAG, "onComplete: successfully set the user client.");
+                        User user = task.getResult().toObject(User.class);
+                        mUserLocation.setUser(user);
+                        getLastKnownLocation();
+                    }
+                }
+            });
+        }
+        else{
+            getLastKnownLocation();
+        }
+    }
+
+    private void getLastKnownLocation() {
+        Log.d(TAG, "getLastKnownLocation: called.");
+
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<android.location.Location>() {
+            @Override
+            public void onComplete(@NonNull Task<android.location.Location> task) {
+                if (task.isSuccessful()) {
+                    Location location = task.getResult();
+                    GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                    mUserLocation.setGeo_point(geoPoint);
+                    mUserLocation.setTimestamp(null);
+                    saveUserLocation();
+                }
+            }
+        });
+
+    }
+
+    private void saveUserLocation(){
+
+        if(mUserLocation != null){
+            DocumentReference locationRef = mDb
+                    .collection(getString(R.string.collection_user_locations))
+                    .document(FirebaseAuth.getInstance().getUid());
+
+            locationRef.set(mUserLocation).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        Log.d(TAG, "saveUserLocation: \ninserted user location into database." +
+                                "\n latitude: " + mUserLocation.getGeo_point().getLatitude() +
+                                "\n longitude: " + mUserLocation.getGeo_point().getLongitude());
+                    }
+                }
+            });
+        }
     }
 
     private boolean checkMapServices(){
@@ -139,6 +223,7 @@ public class Home extends FragmentActivity implements BottomNavigationView.OnNav
                 if(mLocationPermissionGranted){
                     //process app
                     loadFragment(new Dashboard());
+                    getUserDetails();
                 }
                 else{
                     getLocationPermission();
@@ -148,17 +233,13 @@ public class Home extends FragmentActivity implements BottomNavigationView.OnNav
     }
 
     private void getLocationPermission() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
             //process app
             loadFragment(new Dashboard());
+            getUserDetails();
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
@@ -188,10 +269,12 @@ public class Home extends FragmentActivity implements BottomNavigationView.OnNav
         if(checkMapServices()){
             if(mLocationPermissionGranted){
                 loadFragment(new Dashboard());
+                getUserDetails();
             }
             else{
                 getLocationPermission();
             }
         }
     }
+
 }

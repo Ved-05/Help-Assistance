@@ -142,8 +142,8 @@ public class UserDetails extends AppCompatActivity {
        Map<String, Object> node = new HashMap<>();
        node.put("name", userName);
        node.put("gender", gender);
-       node.put("date-of-birth", date);
-       node.put("mobile-number", mobile);
+       node.put("dateOfBirth", date);
+       node.put("mobileNumber", mobile);
        node.put("ID", userId);
 
        database.collection("users")

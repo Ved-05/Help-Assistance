@@ -37,8 +37,11 @@ dependencies {
     //firestore
     implementation 'com.google.firebase:firebase-firestore:18.0.1'
 
-    //google play serices for maps
+    //google play services for maps
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
+
+    //google maps sdk
+    implementation "com.google.android.gms:play-services-location:15.0.1"
 }
 // ADD THIS AT THE BOTTOM
 apply plugin: 'com.google.gms.google-services'

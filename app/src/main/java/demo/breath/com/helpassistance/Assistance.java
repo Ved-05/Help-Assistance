@@ -1,13 +1,28 @@
 package demo.breath.com.helpassistance;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 
 import org.w3c.dom.Text;
 
@@ -17,18 +32,26 @@ public class Assistance extends AppCompatActivity {
     private ImageView imgContainer;
     private Button cancel, outOfEmg, yesButton, noButton;
     private TextView statusBar, response;
+    private FirebaseFirestore mDb;
+    private FirebaseAuth mAuth;
+    private UserLocation mUserLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_assistance);
 
-        int id = getIntent().getIntExtra("choosed", 0);
+        final int id = getIntent().getIntExtra("choosed", 0);
+
+        mDb = FirebaseFirestore.getInstance();
+
+        getActiveUserDetails(id);
 
         imgContainer = (ImageView) findViewById(R.id.img_container);
         outOfEmg = (Button) findViewById(R.id.outOfEmergency);
         switch(id){
-            case 0: imgContainer.setImageResource(getResources().getIdentifier("img_sos", "drawable",  getPackageName()));
+            case 0:
+                imgContainer.setImageResource(getResources().getIdentifier("img_sos", "drawable",  getPackageName()));
                 outOfEmg.setTextColor(getResources().getColor(R.color.fontColorPrimary));
                 outOfEmg.setBackgroundResource(getResources().getIdentifier("btn_asst_sos", "drawable",  getPackageName()));
                 break;
@@ -94,4 +117,51 @@ public class Assistance extends AppCompatActivity {
             }
         });
     }
+
+    private void getActiveUserDetails(final int id) {
+        if(mUserLocation == null){
+            mUserLocation = new UserLocation();
+            final DocumentReference activeUserRef = mDb.collection(getString(R.string.collection_user_locations))
+                    .document(FirebaseAuth.getInstance().getUid());
+
+            activeUserRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if(task.isSuccessful()){
+                        final UserLocation user = task.getResult().toObject(UserLocation.class);
+
+                        switch (id) {
+                            case 0:
+                                user.setAssistanceRequired(true);
+                                break;
+                            case 1:
+                                user.setNeed_Accident_Assistance(true);
+                                break;
+                            case 2:
+                                user.setNeed_Harassment_Assistance(true);
+                                break;
+                            case 3:
+                                user.setNeed_Medical_Assistance(true);
+                                break;
+                            case 4:
+                                user.setNeed_Terrorism_Assistance(true);
+                                break;
+                        }
+
+                        Log.d("Assistance Activity", "Fetched and Update: successfully set the user client." + user);
+                        mUserLocation = user;
+
+                        activeUserRef.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("Assistance Activity", "Fetched and Update: User." + user + "\nmUserLocation."+ mUserLocation);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+
 }
