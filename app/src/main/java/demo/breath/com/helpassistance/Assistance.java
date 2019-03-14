@@ -3,6 +3,8 @@ package demo.breath.com.helpassistance;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,15 +29,19 @@ import com.google.firebase.firestore.GeoPoint;
 
 import org.w3c.dom.Text;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 public class Assistance extends AppCompatActivity {
 
     //Image
     private ImageView imgContainer;
     private Button cancel, outOfEmg, yesButton, noButton;
-    private TextView statusBar, response;
+    private TextView statusBar, response, userAddContainer;
     private FirebaseFirestore mDb;
-    private FirebaseAuth mAuth;
     private UserLocation mUserLocation;
+    private String userAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +80,21 @@ public class Assistance extends AppCompatActivity {
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                mDb.collection(getString(R.string.collection_assistance))
+                        .document(FirebaseAuth.getInstance().getUid())
+                        .delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                finish();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(getApplicationContext(), "Failed deleting node.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
 
@@ -100,7 +121,21 @@ public class Assistance extends AppCompatActivity {
         yesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                mDb.collection(getString(R.string.collection_assistance))
+                        .document(FirebaseAuth.getInstance().getUid())
+                        .delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                finish();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(getApplicationContext(), "Failed deleting node.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
 
@@ -116,12 +151,25 @@ public class Assistance extends AppCompatActivity {
                 noButton.setVisibility(View.GONE);
             }
         });
+
+        userAddContainer = (TextView) findViewById(R.id.useradd);
+    }
+
+    private String getAddress(double latitude, double longitude) throws IOException {
+        Geocoder geocoder = new Geocoder(Assistance.this, Locale.getDefault());
+        List<Address> addresses= geocoder.getFromLocation(latitude, longitude, 1);
+        String userAddress = addresses.get(0).getAddressLine(0);
+        return userAddress;
+
     }
 
     private void getActiveUserDetails(final int id) {
         if(mUserLocation == null){
             mUserLocation = new UserLocation();
             final DocumentReference activeUserRef = mDb.collection(getString(R.string.collection_user_locations))
+                    .document(FirebaseAuth.getInstance().getUid());
+
+            final DocumentReference assistanceRef = mDb.collection(getString(R.string.collection_assistance))
                     .document(FirebaseAuth.getInstance().getUid());
 
             activeUserRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -151,7 +199,14 @@ public class Assistance extends AppCompatActivity {
                         Log.d("Assistance Activity", "Fetched and Update: successfully set the user client." + user);
                         mUserLocation = user;
 
-                        activeUserRef.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        try {
+                            userAddress = getAddress(user.getGeo_point().getLatitude(),user.getGeo_point().getLongitude());
+                            userAddContainer.setText(userAddress);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        assistanceRef.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 Log.d("Assistance Activity", "Fetched and Update: User." + user + "\nmUserLocation."+ mUserLocation);

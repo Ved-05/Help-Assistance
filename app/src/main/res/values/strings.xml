@@ -45,7 +45,7 @@
     <string name="hold_tight_dispatch_is_on_the_way">Hold tight, dispatch is on the way</string>
     <string name="detected_location">DETECTED LOCATION</string>
     <string name="government_college_of_engineering_kathora_naka_amravati_maharahtra">Government College of Engineering, Kathora Naka, Amravati, Maharashtra</string>
-    <string name="police_station_shegaon_naka_amravati_maharashtra_india">Police Station, Shegaon Naka, Amravati, Maharashtra, India</string>
+    <string name="police_station_shegaon_naka_amravati_maharashtra_india">Gadge Nagar Police Station, Amravati, Maharashtra, India</string>
     <string name="alert_send_to">Alert Send To</string>
     <string name="cancel">Cancel</string>
     <string name="out_of_emergency">Out Of Emergency</string>
@@ -56,4 +56,5 @@
     <string name="google_maps_api_key">AIzaSyB0jfByn_dyejB9-e5-V_olfgmVhyhdVwQ</string>
     <string name="collection_users">users</string>
     <string name="collection_user_locations">active</string>
+    <string name="collection_assistance">assistance</string>
 </resources>

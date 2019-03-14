@@ -40,7 +40,7 @@
         android:elevation="7dp"/>
 
     <TextView
-        android:id="@+id/status3"
+        android:id="@+id/useradd"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
@@ -100,10 +100,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/status3" />
+        app:layout_constraintTop_toBottomOf="@+id/useradd" />
 
     <TextView
-        android:id="@+id/status4"
+        android:id="@+id/recieverAdd"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
@@ -141,7 +141,7 @@
         app:fontFamily="@font/poppins_medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/status4" />
+        app:layout_constraintTop_toBottomOf="@+id/recieverAdd" />
 
     <Button
         android:id="@+id/outOfEmergency"
@@ -179,7 +179,7 @@
         app:fontFamily="@font/poppins_semi_bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/status4" />
+        app:layout_constraintTop_toBottomOf="@+id/recieverAdd" />
 
     <Button
         android:id="@+id/noBtn"

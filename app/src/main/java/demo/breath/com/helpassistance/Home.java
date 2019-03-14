@@ -1,6 +1,7 @@
 package demo.breath.com.helpassistance;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -33,6 +34,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+
+import demo.breath.com.helpassistance.services.LocationService;
 
 import static demo.breath.com.helpassistance.Constants.ERROR_DIALOG_REQUEST;
 import static demo.breath.com.helpassistance.Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION;
@@ -99,6 +102,32 @@ public class Home extends FragmentActivity implements BottomNavigationView.OnNav
         return false;
     }
 
+    private void startLocationService(){
+        if(!isLocationServiceRunning()){
+            Intent serviceIntent = new Intent(this, LocationService.class);
+            //        this.startService(serviceIntent);
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+
+                Home.this.startForegroundService(serviceIntent);
+            }else{
+                startService(serviceIntent);
+            }
+        }
+    }
+
+    private boolean isLocationServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
+            if("demo.breath.com.helpassistance.services.LocationService".equals(service.service.getClassName())) {
+                Log.d(TAG, "isLocationServiceRunning: location service is already running.");
+                return true;
+            }
+        }
+        Log.d(TAG, "isLocationServiceRunning: location service is not running.");
+        return false;
+    }
+
     private void getUserDetails(){
         if(mUserLocation == null){
             mUserLocation = new UserLocation();
@@ -138,6 +167,7 @@ public class Home extends FragmentActivity implements BottomNavigationView.OnNav
                     mUserLocation.setGeo_point(geoPoint);
                     mUserLocation.setTimestamp(null);
                     saveUserLocation();
+                    //startLocationService();
                 }
             }
         });
